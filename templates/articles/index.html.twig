@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles index{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Tous nos articles</h1>
+
+        {% for article in articles  %}
+            <p> {{ article.title }}</p>
+            <p> Cette article est relation avec </p>
+            <p>Auteur : {{ article.author }}</p>
+            <p>Intro: {{ article.description }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

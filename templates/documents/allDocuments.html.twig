@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="container d-flex" id="document-list">
+        {% for document in docs %}
+            <div>
+                <p><a href="{{ path("show_preview", {"modelid":document.id}) }}">{{ document.name }}</a></p>
+                <p>Catégories :
+                {% for catego in document.categorie %}
+                    {{ catego.name }}
+                {% endfor %}
+                    .</p>
+                <p>Ce type d'entreprise en a souvent besoin :
+                {% for typeEntr in document.companyType %}
+                    {{ typeEntr.name }}
+                {% endfor %}
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

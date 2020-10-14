@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto">
+        <p>Document : {{ document[0].name }}.
+        <form method="post" action="{{ path("pay_document", {"id":document[0].id}) }}">
+            <input type="submit" value="J'achète">
+        </form>
+        {% if pdf_url != false %}
+            <embed src="{{ asset(pdf_url) }}" height="420px" width="100%">
+        {% else %}
+            <p>Aucune preview disponible pour ce document</p>
+        {% endif %}
+    </div>
+{% endblock %}

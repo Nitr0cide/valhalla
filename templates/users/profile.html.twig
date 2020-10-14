@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User dashboard (profile){% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur votre profil {{ users.login }}</h1>
+
+    <div style="background-color: lightcyan" class="text-center">
+        <h3>Gestion de vos dossiers en attente</h3>
+        <div class="d-flex justify-content-center">
+            <p>Demande de création entreprise<a href="#">Voir l'avancement</a></p>
+            <p>Demande contrat spécifique<a href="#">Voir l'avancement</a></p>
+            <p>Upload de vos documents personnelles<a href="#">Voir l'avancement</a></p>
+        </div>
+    </div>
+<div class="container text-center">
+    <h1>Vos documents en attente d'être remplis</h1>
+    {% for userdocument in documents %}
+        {% if userdocument.generatedPdf == null %}
+            <a href="{{ url('fill_document', {"id": userdocument.document.id}) }}">{{ userdocument.document.name }}</a>
+        {% endif %}
+    {% endfor %}
+    <h1>Vos documents</h1>
+    {% for userdocument in documents %}
+        {% if userdocument.generatedPdf != null %}
+            <a href="{{ asset('userdocuments/' ~ app.user.login ~ userdocument.document.name) }}">{{ userdocument.document.name }}</a>
+        {% endif %}
+    {% endfor %}
+    <h3>Actions nécessaires</h3>
+    {% if users.accountVerified == 0 %}
+        <a href="#">Vérifier mon identité</a>
+    {% endif %}
+    <div>
+        <h3>Vos structures juridiques</h3>
+        <div>
+            {% for entreprise in entreprises %}
+                <a href="">Gérer l'entreprise {{ entreprise.name }}</a>
+                <p>Associés ou référents :
+                {% for userlogin in entreprise.users %}
+                    {% if userlogin != app.user.login %}
+                        <a href="{{ path('users_index', {'userName':userlogin}) }}">{{ userlogin }}</a>
+                    {% endif %}</p>
+                {% endfor %}
+                <a href="#">Changer ses statuts</a>
+                <a href="#">Faire une AG</a>
+                <div>
+                    <h5>Quelques documents qui pourraient intéresser {{ entreprise.name }}</h5>
+                    <div class="d-flex">
+                        <p>Document 1</p>
+                        <p>Document 2</p>
+                        <p>Document 3</p>
+                    </div>
+                </div>
+            {% endfor %}
+            <a href="{{ path('companies_new') }}">Ajouter une structure</a>
+            <a href="#">Créer sa structure</a>
+        </div>
+    </div>
+    <div>
+        <h3>Les modèles de documents que vous avez acheté</h3>
+        <p></p>
+    </div>
+</div>
+{% endblock %}

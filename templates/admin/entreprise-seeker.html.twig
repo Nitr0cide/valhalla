@@ -1,0 +1,72 @@
+{% extends 'admin/baseadmin.html.twig' %}
+
+{% block title %} Trouver des informations entreprise {% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <form method="POST" action="">
+        <label for="siren">Entrez le n° SIREN, SIRET ou RNA</label>
+        <input type="text" name="siren">
+        <input type="submit" value="Rechercher">
+    </form>
+</div>
+    <div class="container">
+    {% if entite != null %}
+        {% if entite.siren != null %}
+        <!-- entite -->
+            <ul>
+                <li>Numéro SIREN : {{ entite.siren }}</li>
+                <li>Numéro NIC du siège : {{ entite.nic_siege }}</li>
+                <li>Denomination : {{ entite.personne_morale.denomination }}</li>
+                <li>Activité : {{ entite.etablissement_principal.activite }}</li>
+                <li>Code APE : {{ entite.activite_principale }}</li>
+                <li>Forme juridique : {{ entite.personne_morale.forme_juridique }}</li>
+                <li>Nom du greffe : {{ entite.nom_greffe }}</li>
+                <li>Code greffe : {{ entite.code_greffe }}</li>
+                <li>Capital {{ entite.personne_morale.capital }}€</li>
+                <li>Siège social : {{ entite.etablissement_principal.adresse_ligne_1 }}{{ entite.etablissement_principal.adresse_ligne_2 }}</li>
+                <li>Code postal : {{ entite.etablissement_principal.adresse_code_postal }}</li>
+                <li>Ville : {{ entite.etablissement_principal.adresse_ville }}, pays : {{ entite.etablissement_principal.adresse_pays }}</li>
+                <li>Date d'immatriculation : {{ entite.personne_morale.date_derniere_modification|date("d/m/Y")}}</li>
+                <li>Représentant légaux :
+                    {% for representant in entite.representants %}
+                    <ul>
+                        <li>Nom prénom : {{ representant.prenoms }}
+                            {% if representant.nom_usage == null %}
+                                {{ representant.nom_patronyme }}
+                            {% else %}
+                                {{ representant.nom_usage }}
+                            {% endif %}
+                        </li>
+                        <li>Qualité : {{ representant.qualite }}</li>
+                        <li>Adresse : {{ representant.adresse_ligne_1 }} {{ representant.adresse_ligne_2 }} {{ representant.adresse_code_postal }} {{ representant.adresse_ville }}</li>
+                        </br>
+                    </ul>
+                    {% endfor %}
+                </li>
+            </ul>
+        {% else %}
+        <!-- ASSOCIATION -->
+            <ul>
+                <li>N° RNA : {{ entite.id_association }}</li>
+                <li>N° SIRET : {{ entite.siret  }}</li>
+                <li>Nom de l'association : {{ entite.titre }}</li>
+                <li>Code gestion : {{ entite.code_gestion }}</li>
+                <li>Date de création : {{ entite.date_creation }}</li>
+                <li>Date de dernière déclaration : {{ entite.date_derniere_declaration }}</li>
+                <li>Nature : {{ entite.nature }}</li>
+                <li>Groupement : {{ entite.groupement }}</li>
+                <li>But : {{ entite.objet }}</li>
+                <li>Adresse : {{ entite.adresse_gestion_libelle_voie }} {{ entite.adresse_code_postal }} {{ entite.adresse_libelle_commune }}</li>
+                <li>Pays de gestion : {{ entite.adresse_gestion_pays }}</li>
+                <li>Date de dernière mise à jour : {{ entite.derniere_maj | date("d/m/Y") }}</li>
+            </ul>
+        {% endif %}
+    {% endif %}
+    </div>
+{% endblock %}

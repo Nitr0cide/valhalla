@@ -1,0 +1,14 @@
+{% extends 'admin/baseadmin.html.twig' %}
+
+{% block body %}
+
+<div class="example-wrapper">
+    <form method="POST" action="">
+        <label for="siren">Entrez le n° SIREN, SIRET ou RNA</label>
+        <input type="text" name="siren_or_siret">
+        <input type="submit" value="Rechercher">
+    </form>
+</div>
+
+    {{ dump(entreprise) }}
+{% endblock %}

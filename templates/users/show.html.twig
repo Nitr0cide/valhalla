@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Users{% endblock %}
+
+{% block body %}
+    <h1>Users</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <th>Login</th>
+                <td>{{ user.login }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+                <th>Hashed_password</th>
+                <td>{{ user.password }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Connected_at</th>
+                <td>{{ user.connectedAt ? user.connectedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Verified_mail</th>
+                <td>{{ user.verifiedMail ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Account_verified</th>
+                <td>{{ user.accountVerified ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Telephone</th>
+                <td>{{ user.telephone }}</td>
+            </tr>
+        <tr>
+            <th>account type</th>
+            <td>{{ user.accountType }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('users_edit', {'id': user.id}) }}">edit</a>
+
+    {{ include('users/_delete_form.html.twig') }}
+{% endblock %}
