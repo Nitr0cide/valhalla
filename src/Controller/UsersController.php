@@ -7,6 +7,7 @@ use App\Entity\UserDocuments;
 use App\Entity\Users;
 use App\Form\UsersType;
 use App\Repository\DocumentsRepository;
+use App\Repository\UserDocumentsRepository;
 use App\Repository\UsersRepository;
 use ContainerENym6bk\getAccountTypeRepositoryService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +24,7 @@ use Symfony\Component\Validator\Constraints\File;
 class UsersController extends AbstractController
 {
     private $passwordEncoder;
+    private $usersDir = "C:/symfony/artis_concillium/public/userdocuments/";
 
     public function __construct(UserPasswordEncoderInterface $encoder)
     {
@@ -32,7 +34,7 @@ class UsersController extends AbstractController
     /**
      * @Route("/users/profile/{userName}", name="users_index", methods={"GET"}, priority=10)
      */
-    public function index(UsersRepository $usersRepository, DocumentsRepository $docRepo, string $userName): Response
+    public function index(UsersRepository $usersRepository, UserDocumentsRepository $userDocRepo, DocumentsRepository $docRepo, string $userName): Response
     {
         $user = $this->doesUserExist($usersRepository, $userName);
 
@@ -44,15 +46,15 @@ class UsersController extends AbstractController
 
         $currentUser = $this->getUser() ? $this->getUser()->getUserLogin() : null;
 
+
         if ($userName === $currentUser) {
             $user = $usersRepository->findOneBy(["login" => "$userName"]);
-
-
 
             return $this->render('users/profile.html.twig', [
                 'users' => $user,
                 'entreprises' => $user->getCompanies(),
-                'documents' => $user->getUserDocuments(),
+                'doc_waiting' => $userDocRepo->findBy(["user" => $user->getId(), "generated_pdf" => null]),
+                'doc_filled' => $userDocRepo->findBy(["user" => $user->getId()], ["generated_pdf" => 'DESC']),
             ]);
         }
 
@@ -75,7 +77,7 @@ class UsersController extends AbstractController
         }
 
         $user = new Users();
-        $form = $this->createForm(UsersType::class, $user);
+        $form = $this->createForm(UsersType::class, $user, [], "");
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -87,6 +89,13 @@ class UsersController extends AbstractController
             $user->setRoles(["ROLE_USER"]);
             $entityManager->persist($user);
             $entityManager->flush();
+
+            // A la création du compte on crée également un dossier qui réceptionnera tous les documents générés
+            if (!is_dir($this->usersDir.$user->getUserLogin())) {
+                mkdir($this->usersDir . $user->getUserLogin());
+            } else {
+                throw new \Exception("Un problème technique est survenu, contactez nous au ");
+            }
 
             return $this->redirectToRoute('users_index', ["userName" => $user->getUserLogin()]);
         }

@@ -18,13 +18,23 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use mikehaertl\wkhtmlto\Pdf;
 use App\Controller\DocumentsController;
+use DateTimeZone;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class DocumentsController extends AbstractController
 {
     private $modelDocPath = "/documents/";  // Chemin racine vers tous les modèles documents
     private $exampleDocPath = "pdf-examples/"; // Chemin racine vers tous les exemples de document
+    private $pdfListPath = "/public/userdocuments/";
+    private $currentDocPath = "";
 
     private $articleFacade;
+
+    public function __construct()
+    {
+
+    }
+
     /**
      * @Route("/documents/tous-les-documents", name="all_documents")
      */
@@ -79,7 +89,7 @@ class DocumentsController extends AbstractController
 
         $userDoc->setDocument($docPurchased[0]);
         $userDoc->setUser($this->getUser());
-        $userDoc->setCreatedAt(new \DateTime());
+        $userDoc->setCreatedAt(new \DateTime('now', new DateTimeZone('Europe/Paris')));
 
         $em->persist($userDoc);
         $em->flush();
@@ -90,10 +100,17 @@ class DocumentsController extends AbstractController
     /**
      * @Route("/documents/fill/{id}/", name="fill_document", methods={"GET", "POST"})
      */
-    public function fillDocument(DocumentsRepository $docRepo, UserDocumentsRepository $userDocRepo, Request $request, int $id)
+    public function fillDocument(DocumentsRepository $docRepo, UserDocumentsRepository $userDocRepo, Request $request, UserPasswordEncoderInterface $encoder, int $id)
     {
-        // Appelle l'entité et le formulaire dynamiquement en fonction du document en cours d'édition
             $currentDoc = $docRepo->findBy(["id" => $id]);
+
+        // Si le document a bien été acheté par l'utilisateur et qu'il n'a pas encore modifié (generated_pdf = null) on lui affiche le formulaire
+            $userDocRepo->findOneBy(["user" => $this->getUser()->getId(), "document" => $id, "generated_pdf" => null]);
+
+        // Appelle l'entité et le formulaire dynamiquement en fonction du document en cours d'édition
+
+            $this->currentDocPath = $this->pdfListPath.$this->getUser()->getUserLogin()."/".$currentDoc[0]->getDocModelName();
+
             $name = $currentDoc[0]->getDocModelName();
             $docEntity= str_replace("_", "", $name);
             $formEntity = "App\\Form\\Documents\\".$docEntity."Type";
@@ -109,20 +126,30 @@ class DocumentsController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid())
             {
+                $date = new \DateTime('now', new DateTimeZone('Europe/Paris'));
+
                 $htmlContent = $this->render($this->modelDocPath.$currentDoc[0]->getDocModelName().".html.twig", [
                     "docParams" => $form->getData(),
                 ])->getContent();
 
                 $pdf = new Pdf($htmlContent);
 
-    //            if (!$pdf->saveAs("C:/symfony/artis_concillium/public/userdocuments/".$currentDoc[0]->getDocModelName().".pdf")) {
-     //               $pdf->getError();
-       //             $this->redirectToRoute('fill_document', ["id" => $id]);
-         //       }
+               // Cette requête sert à lui faire modifier la première ligne que l'on trouvera dans userDocuments
+                // qui correspond au document qu'il veut modifier (dans le cas où l'utilisateur a acheté plusieurs fois le même document
+                // en avoir rempli un seul
+                $result = $userDocRepo->findFirstNonFilledDoc($id, $this->getUser()->getId());
+               // On rajoute le chemin du pdf qu'on a généré à la ligne correspondante (id récupéré dans la requête précédente)
+                if (!$this->addPdfToUser($result[0]->getId(), $userDocRepo, $date))
+                {
+                    return $this->redirectToRoute('users_index', ["userName" => $this->getUser()->getUserLogin()]);
+                }
 
-                dd($userDocRepo->findFirstNonFilledDoc());
-                $this->addDocumentToUser();
 
+                // On enregistre le fichier avec le timestamp contenu en base de données
+                if (!$pdf->saveAs("C:/symfony/artis_concillium".$this->currentDocPath.$date->format("YmdHis").".pdf")) {
+                    $pdf->getError();
+                    $this->redirectToRoute('fill_document', ["id" => $id]);
+                }
             }
 
             return $this->render('documents/fillDocument.html.twig', [
@@ -130,4 +157,17 @@ class DocumentsController extends AbstractController
             ]);
     }
 
+    /**
+     * @param $id
+     * @param $userLogin
+     * @param UserDocumentsRepository $userDocRepo
+     */
+    private function addPdfToUser($id, UserDocumentsRepository $userDocRepo, $timestamp)
+    {
+        if(!$userDocRepo->addPdfToRow($id, $this->currentDocPath, $timestamp))
+        {
+            return false;
+        }
+        return true;
+    }
 }

@@ -31,7 +31,7 @@ class CompaniesController extends AbstractController
     public function new(Request $request): Response
     {
         $company = new Companies();
-        $form = $this->createForm(CompaniesType::class, $company);
+        $form = $this->createForm(CompaniesType::class, $company, [], "");
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

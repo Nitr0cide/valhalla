@@ -19,10 +19,35 @@ class UserDocumentsRepository extends ServiceEntityRepository
         parent::__construct($registry, UserDocuments::class);
     }
 
-    public function findFirstNonFilledDoc()
+    public function findFirstNonFilledDoc($id, $user)
     {
-        return $this->createQueryBuilder("userDoc");
+        return $this->createQueryBuilder("userDoc")
+            ->andWhere("userDoc.document = :document")
+            ->andWhere("userDoc.user = :user")
+            ->andWhere("userDoc.generated_pdf is null")
+            ->setParameter('document', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->execute();
     }
+
+    public function addPdfToRow($id, $pdfPath, $timestamp)
+    {
+        $formattedDate = $timestamp->format("YmdHis");
+
+        return $this->createQueryBuilder('p')
+            ->update($this->getClassName(), 'ud')
+            ->where('ud.id = :id')
+            ->set('ud.generated_pdf', ':generated_pdf')
+            ->set('ud.generated_at', ':datetime')
+            ->setParameter('id', $id)
+            ->setParameter('generated_pdf', $pdfPath.$formattedDate)
+            ->setParameter('datetime', $timestamp)
+            ->getQuery()
+            ->execute();
+    }
+
 
     // /**
     //  * @return UserDocuments[] Returns an array of UserDocuments objects

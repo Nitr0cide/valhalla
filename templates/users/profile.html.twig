@@ -15,15 +15,16 @@
     </div>
 <div class="container text-center">
     <h1>Vos documents en attente d'être remplis</h1>
-    {% for userdocument in documents %}
+    {% for userdocument in doc_waiting %}
         {% if userdocument.generatedPdf == null %}
             <a href="{{ url('fill_document', {"id": userdocument.document.id}) }}">{{ userdocument.document.name }}</a>
         {% endif %}
     {% endfor %}
     <h1>Vos documents</h1>
-    {% for userdocument in documents %}
+    {% for userdocument in doc_filled %}
         {% if userdocument.generatedPdf != null %}
-            <a href="{{ asset('userdocuments/' ~ app.user.login ~ userdocument.document.name) }}">{{ userdocument.document.name }}</a>
+            <a href="{{ asset(userdocument.generatedPdf ~ ".pdf") }}">{{ userdocument.document.name }}</a>
+            <p>Vous avez généré ce document le {{ userdocument.generatedAt|date("m/d/Y à H:i") }}</p>
         {% endif %}
     {% endfor %}
     <h3>Actions nécessaires</h3>
@@ -55,10 +56,6 @@
             <a href="{{ path('companies_new') }}">Ajouter une structure</a>
             <a href="#">Créer sa structure</a>
         </div>
-    </div>
-    <div>
-        <h3>Les modèles de documents que vous avez acheté</h3>
-        <p></p>
     </div>
 </div>
 {% endblock %}

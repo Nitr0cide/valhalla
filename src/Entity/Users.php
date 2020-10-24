@@ -93,7 +93,7 @@ class Users implements UserInterface
     /**
      * @ORM\Column(type="boolean")
      */
-    private $accountVerified;
+    private $accountVerified = 0;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -101,7 +101,7 @@ class Users implements UserInterface
     private $account_ID_path;
 
     /**
-     * @ORM\OneToMany(targetEntity=UserDocuments::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=UserDocuments::class, mappedBy="user", cascade={"all"}, fetch="EAGER")
      */
     private $userDocuments;
 

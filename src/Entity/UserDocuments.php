@@ -18,7 +18,7 @@ class UserDocuments
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Documents::class, inversedBy="userDocuments")
+     * @ORM\ManyToOne(targetEntity=Documents::class, inversedBy="userDocuments", cascade={"all"}, fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private $document;
@@ -38,6 +38,11 @@ class UserDocuments
      * @ORM\Column(type="datetime")
      */
     private $created_at;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $generated_at;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -108,5 +113,21 @@ class UserDocuments
         $this->generated_pdf = $generated_pdf;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGeneratedAt()
+    {
+        return $this->generated_at;
+    }
+
+    /**
+     * @param mixed $generated_at
+     */
+    public function setGeneratedAt($generated_at): void
+    {
+        $this->generated_at = $generated_at;
     }
 }
