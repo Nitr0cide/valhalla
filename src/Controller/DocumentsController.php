@@ -25,7 +25,7 @@ class DocumentsController extends AbstractController
 {
     private $modelDocPath = "/documents/";  // Chemin racine vers tous les modèles documents
     private $exampleDocPath = "pdf-examples/"; // Chemin racine vers tous les exemples de document
-    private $pdfListPath = "/public/userdocuments/";
+    private $pdfListPath = "/userdocuments/";
     private $currentDocPath = "";
 
     private $articleFacade;
@@ -146,7 +146,7 @@ class DocumentsController extends AbstractController
 
 
                 // On enregistre le fichier avec le timestamp contenu en base de données
-                if (!$pdf->saveAs("C:/symfony/artis_concillium".$this->currentDocPath.$date->format("YmdHis").".pdf")) {
+                if (!$pdf->saveAs("C:/symfony/artis_concillium/public".$this->currentDocPath.$date->format("YmdHis").".pdf")) {
                     $pdf->getError();
                     $this->redirectToRoute('fill_document', ["id" => $id]);
                 }

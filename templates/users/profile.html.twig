@@ -23,7 +23,7 @@
     <h1>Vos documents</h1>
     {% for userdocument in doc_filled %}
         {% if userdocument.generatedPdf != null %}
-            <a href="{{ asset(userdocument.generatedPdf ~ ".pdf") }}">{{ userdocument.document.name }}</a>
+            <a href="{{ userdocument.generatedPdf ~ ".pdf" }}">{{ userdocument.document.name }}</a>
             <p>Vous avez généré ce document le {{ userdocument.generatedAt|date("m/d/Y à H:i") }}</p>
         {% endif %}
     {% endfor %}

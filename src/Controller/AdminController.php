@@ -62,4 +62,5 @@ class AdminController extends AbstractController
             'entite' => isset($response) ? $response : null,
         ]);
     }
+
 }

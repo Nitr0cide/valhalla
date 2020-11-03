@@ -105,6 +105,11 @@ class Users implements UserInterface
      */
     private $userDocuments;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Factures::class, mappedBy="user")
+     */
+    private $factures;
+
 
     public function __construct()
     {
@@ -112,6 +117,7 @@ class Users implements UserInterface
         $this->created_at = new \DateTime();
         $this->companies = new ArrayCollection();
         $this->userDocuments = new ArrayCollection();
+        $this->factures = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -389,6 +395,37 @@ class Users implements UserInterface
             // set the owning side to null (unless already changed)
             if ($userDocument->getUser() === $this) {
                 $userDocument->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Factures[]
+     */
+    public function getFactures(): Collection
+    {
+        return $this->factures;
+    }
+
+    public function addFacture(Factures $facture): self
+    {
+        if (!$this->factures->contains($facture)) {
+            $this->factures[] = $facture;
+            $facture->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFacture(Factures $facture): self
+    {
+        if ($this->factures->contains($facture)) {
+            $this->factures->removeElement($facture);
+            // set the owning side to null (unless already changed)
+            if ($facture->getUser() === $this) {
+                $facture->setUser(null);
             }
         }
 
