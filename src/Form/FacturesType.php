@@ -11,10 +11,19 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 class FacturesType extends AbstractType
 {
+    private $userLogin;
+
+    public function __construct(Security $security)
+    {
+        $this->userLogin = $security->getUser()->getUserLogin();
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -38,8 +47,12 @@ class FacturesType extends AbstractType
             ])
             ->add('tva', NumberType::class, [
                 'label' => 'Taux de TVA applicable',
+                'data' => 20
             ])
-            ->add('file_path', FileType::class)
+            ->add('file_path', FileType::class, [
+                'data_class' => null,
+                'required' => false,
+            ])
             ->add('categorie')
         ;
     }

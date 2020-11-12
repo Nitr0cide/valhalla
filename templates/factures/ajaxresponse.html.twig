@@ -1,0 +1,7 @@
+{% if factures is empty %}
+    <p>Aucun résultat</p>
+{% endif %}
+{% for facture in factures %}
+    <h3>{{ facture.clientName }}</h3>
+    <p><a href="{{ "/userdocuments/" ~ app.user.login ~ "/factures/" ~ facture.filePath }}">Voir ma facture</a></p>
+{% endfor %}

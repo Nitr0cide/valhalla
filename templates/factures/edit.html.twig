@@ -3,11 +3,13 @@
 {% block title %}Edit Factures{% endblock %}
 
 {% block body %}
-    <h1>Edit Factures</h1>
+    <div class="container">
+        <h1>Modification</h1>
 
-    {{ include('factures/_form.html.twig', {'button_label': 'Update'}) }}
+        {{ include('factures/_form.html.twig', {'button_label': 'Update'}) }}
 
-    <a href="{{ path('factures_index') }}">back to list</a>
+        <a href="{{ path('factures_index') }}">Retour</a>
 
-    {{ include('factures/_delete_form.html.twig') }}
+        {{ include('factures/_delete_form.html.twig') }}
+    </div>
 {% endblock %}

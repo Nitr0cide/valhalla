@@ -44,7 +44,7 @@ class Factures
     private $categorie;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $file_path;
 
@@ -70,6 +70,10 @@ class Factures
      */
     private $user;
 
+    public function __construct()
+    {
+        $this->coutTVA = $this->prix_ht - $this->prix_ttc;
+    }
 
     public function getId(): ?int
     {
@@ -118,7 +122,7 @@ class Factures
         return $this->file_path;
     }
 
-    public function setFilePath(string $file_path): self
+    public function setFilePath(?string $file_path): self
     {
         $this->file_path = $file_path;
 
@@ -165,8 +169,6 @@ class Factures
      */
     public function setCoutTVA($coutTVA): void
     {
-        $this->coutTVA = $this->prix_ttc - $this->prix_ht;
-
         $this->coutTVA = $coutTVA;
     }
 

@@ -19,6 +19,68 @@ class FacturesRepository extends ServiceEntityRepository
         parent::__construct($registry, Factures::class);
     }
 
+    public function searchByName($name, $userid)
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.user = :user')
+            ->andWhere('o.clientName LIKE :clientname')
+            ->setParameter('user', $userid)
+            ->setParameter('clientname', '%'.$name.'%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchByDate($user, $date) {
+        return $this->createQueryBuilder('o')
+            ->where('o.user = :user')
+            ->andWhere('o.date >= :date')
+            ->setParameter('user', $user)
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchBetweenDates($user,\DateTimeInterface $date1,\DateTimeInterface $date2) {
+
+        return $this->createQueryBuilder('o')
+            ->where('o.user = :user')
+            ->andWhere('o.date > :date1')
+            ->andWhere('o.date < :date2')
+            ->setParameter('user', $user)
+            ->setParameter('date1', $date1->format("Y-m-d"))
+            ->setParameter('date2', $date2->format("Y-m-d"))
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchByNameBetweenDates($user, $name, \DateTimeInterface $date1, \DateTimeInterface $date2)
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.user = :user')
+            ->andWhere('o.clientName LIKE :clientname')
+            ->andWhere('o.date >= :date1')
+            ->andWhere('o.date <= :date2')
+            ->setParameter('user', $user)
+            ->setParameter('clientname', '%'.$name.'%')
+            ->setParameter('date1', $date1->format("Y-m-d"))
+            ->setParameter('date2', $date2->format("Y-m-d"))
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function searchByNameAndDate($user, $name, $date)
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.user = :user')
+            ->andWhere('o.clientName LIKE :clientname')
+            ->andWhere('o.date >= :date')
+            ->setParameter('user', $user)
+            ->setParameter('clientname', '%'.$name.'%')
+            ->setParameter('date', $date->format("Y-m-d"))
+            ->getQuery()
+            ->getResult();
+    }
+
     // /**
     //  * @return Factures[] Returns an array of Factures objects
     //  */
